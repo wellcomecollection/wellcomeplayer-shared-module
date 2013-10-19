@@ -13,7 +13,7 @@ class Behaviours {
 
 	static CLOSE_ACTIVE_DIALOGUE: string = 'onCloseActiveDialogue';
 
-	constructor(public extension: IExtension){
+	constructor(public extension: IWellcomeExtension){
 
 	}
 
@@ -31,24 +31,24 @@ class Behaviours {
         // download enabled?
         switch ((<IProvider>this.extension.provider).type) {
             case "book":
-                if ((<IProvider>this.extension.provider).config.options.bookDownloadEnabled === false) {
+                if (this.extension.provider.config.options.bookDownloadEnabled === false) {
                     return false;
                 }
                 break;
             case "video":
-                if ((<IProvider>this.extension.provider).config.options.videoDownloadEnabled === false) {
+                if (this.extension.provider.config.options.videoDownloadEnabled === false) {
                     return false;
                 }
                 break;
             case "audio":
-                if ((<IProvider>this.extension.provider).config.options.audioDownloadEnabled === false) {
+                if (this.extension.provider.config.options.audioDownloadEnabled === false) {
                     return false;
                 }
                 break;
         }
 
         // download available?
-        if (!(<IProvider>this.extension.provider).assetSequence.extensions.permittedOperations.length) {
+        if (!this.extension.provider.assetSequence.extensions.permittedOperations.length) {
             return false;
         }
 
@@ -56,12 +56,12 @@ class Behaviours {
     }
 
     getTrackActionLabel(): string {
-        return      "bNumber: " + (<IProvider>this.extension.provider).pkg.identifier 
-                + ", type: " + (<IProvider>this.extension.provider).type 
-                + ", assetSequenceIndex: " + (<IProvider>this.extension.provider).assetSequenceIndex
+        return      "bNumber: " + this.extension.provider.pkg.identifier 
+                + ", type: " + this.extension.provider.type 
+                + ", assetSequenceIndex: " + this.extension.provider.assetSequenceIndex
                 + ", asset: " + this.extension.currentAssetIndex 
                 + ", isLoggedIn: " + this.isLoggedIn() 
-                + ", isHomeDomain: " + (<IProvider>this.extension.provider).isHomeDomain 
+                + ", isHomeDomain: " + this.extension.provider.isHomeDomain 
                 + ", uri: " + window.parent.location;
     }
 
@@ -112,10 +112,10 @@ class Behaviours {
                 }
 
                 that.sessionTimer = setTimeout(function () {
-                    (<IWellcomeExtension>that.extension).closeActiveDialogue();
-                    (<IWellcomeExtension>that.extension).showDialogue((<IProvider>that.extension.provider).config.modules.genericDialogue.content.sessionExpired, () => {
+                    that.extension.closeActiveDialogue();
+                    that.extension.showDialogue(that.extension.provider.config.modules.genericDialogue.content.sessionExpired, () => {
                         that.extension.refresh();
-                    }, (<IProvider>that.extension.provider).config.modules.genericDialogue.content.refresh, false);
+                    }, that.extension.provider.config.modules.genericDialogue.content.refresh, false);
                 }, ms);
             }
         });
@@ -127,7 +127,7 @@ class Behaviours {
         // so don't allow it to be closed.
         // necessary for video/audio which have no ui to trigger
         // new login event.
-        return (<IProvider>this.extension.provider).assetSequence.assets.length != 1;
+        return this.extension.provider.assetSequence.assets.length != 1;
     }
 
     getInadequatePermissionsMessage(assetIndex): string {
@@ -136,16 +136,16 @@ class Behaviours {
 
         switch (section.extensions.accessCondition.toLowerCase()) {
             case 'requires registration':
-                return (<IProvider>this.extension.provider).config.modules.loginDialogue.requiresRegistrationPermissionsMessage;
+                return this.extension.provider.config.modules.loginDialogue.requiresRegistrationPermissionsMessage;
             case 'clinical images':
-                return (<IProvider>this.extension.provider).config.modules.loginDialogue.clinicalImagesPermissionsMessage;
+                return this.extension.provider.config.modules.loginDialogue.clinicalImagesPermissionsMessage;
             case 'restricted files':
-                return (<IProvider>this.extension.provider).config.modules.loginDialogue.restrictedFilesPermissionsMessage;
+                return this.extension.provider.config.modules.loginDialogue.restrictedFilesPermissionsMessage;
             case 'closed':
-                return (<IProvider>this.extension.provider).config.modules.loginDialogue.closedPermissionsMessage;
+                return this.extension.provider.config.modules.loginDialogue.closedPermissionsMessage;
         }
 
-        return (<IProvider>this.extension.provider).config.modules.loginDialogue.inadequatePermissionsMessage;
+        return this.extension.provider.config.modules.loginDialogue.inadequatePermissionsMessage;
     }
 
     showRestrictedFileDialogue(params): void {
@@ -183,7 +183,7 @@ class Behaviours {
     // pass direction as 1 or -1.
     nextAvailableIndex(direction: number, requestedIndex: number) {
 
-        for (var i = requestedIndex; i < (<IProvider>this.extension.provider).assetSequence.assets.length && i >= 0; i += direction) {
+        for (var i = requestedIndex; i < this.extension.provider.assetSequence.assets.length && i >= 0; i += direction) {
             if (i == requestedIndex) continue;
             if (this.isAuthorised(i)) {
                 return i;
@@ -206,13 +206,13 @@ class Behaviours {
         if (nextAvailableIndex) {
             callback(nextAvailableIndex);
         } else {
-            (<IWellcomeExtension>this.extension).showDialogue((<IProvider>this.extension.provider).config.modules.genericDialogue.content.noRemainingVisibleItems);
+            this.extension.showDialogue(this.extension.provider.config.modules.genericDialogue.content.noRemainingVisibleItems);
         }
     }
 
     login(params: any) {
         var ajaxOptions = {
-            url: (<IWellcomeProvider>this.extension.provider).getLoginUri(params.username, params.password),
+            url: this.extension.provider.getLoginUri(params.username, params.password),
             type: "GET",
             dataType: "json",
             xhrFields: { withCredentials: true },
@@ -222,7 +222,7 @@ class Behaviours {
                 $.publish(login.LoginDialogue.HIDE_LOGIN_DIALOGUE);
 
                 if (result.Message.toLowerCase() == "success") {
-                    (<IWellcomeExtension>this.extension).triggerSocket(login.LoginDialogue.LOGIN, result.DisplayNameBase64);
+                    this.extension.triggerSocket(login.LoginDialogue.LOGIN, result.DisplayNameBase64);
                     params.successCallback(true);
                 } else {
                     params.failureCallback(result.Message, true);
@@ -232,7 +232,7 @@ class Behaviours {
             error: (result: any) => {
                  $.publish(login.LoginDialogue.HIDE_LOGIN_DIALOGUE);
 
-                params.failureCallback((<IProvider>this.extension.provider).config.modules.genericDialogue.content.error, true);
+                params.failureCallback(this.extension.provider.config.modules.genericDialogue.content.error, true);
             }
         };
 
@@ -279,13 +279,13 @@ class Behaviours {
                 this.showLoginDialogue({
                     successCallback: successCallback,
                     failureCallback: failureCallback,
-                    message: (<IProvider>this.extension.provider).config.modules.loginDialogue.loginExpiredMessage,
+                    message: this.extension.provider.config.modules.loginDialogue.loginExpiredMessage,
                     requestedIndex: assetIndex,
                     allowClose: this.allowCloseLogin()
                 });
                 break;
             case 'notacceptedtermsyet':
-                (<IWellcomeExtension>this.extension).showDialogue((<IProvider>this.extension.provider).config.modules.genericDialogue.content.notAcceptedTermsYetMessage);
+                this.extension.showDialogue(this.extension.provider.config.modules.genericDialogue.content.notAcceptedTermsYetMessage);
                 break;
         }
     }
@@ -294,7 +294,7 @@ class Behaviours {
     prefetchAsset(assetIndex: number, successCallback: any): void{
         var asset = this.extension.getAssetByIndex(assetIndex);
 
-        var prefetchUri = (<IWellcomeProvider>this.extension.provider).getPrefetchUri(asset);
+        var prefetchUri = this.extension.provider.getPrefetchUri(asset);
 
         $.getJSON(prefetchUri, function (result) {
             if (result.Success) {
@@ -312,7 +312,7 @@ class Behaviours {
             (reload: boolean) => {
                 if (reload) {
                     // reload the package.
-                    (<IProvider>this.extension.provider).reload(() => {
+                    this.extension.provider.reload(() => {
                         $.publish(baseExtension.BaseExtension.RELOAD);
                         this.viewIndex(assetIndex, successCallback);
                     });
@@ -328,7 +328,7 @@ class Behaviours {
             },
             // failure callback.
             (message: string, retry: boolean) => {
-                (<IWellcomeExtension>this.extension).showDialogue(message, () => {
+                this.extension.showDialogue(message, () => {
                     if (retry) {
                         this.viewIndex(assetIndex, successCallback);
                     }
