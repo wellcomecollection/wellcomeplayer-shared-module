@@ -19,9 +19,9 @@ class Behaviours {
 
 	isSaveToLightboxEnabled(): boolean {
 
-        if ((<IProvider>this.extension.provider).config.options.saveToLightboxEnabled === false) return false;
-        if (!(<IProvider>this.extension.provider).isHomeDomain) return false;
-        if (!(<IProvider>this.extension.provider).isOnlyInstance) return false;
+        if (this.extension.provider.config.options.saveToLightboxEnabled === false) return false;
+        if (!this.extension.provider.isHomeDomain) return false;
+        if (!this.extension.provider.isOnlyInstance) return false;
 
         return true;
     }
@@ -29,7 +29,7 @@ class Behaviours {
     isDownloadEnabled(): boolean {
 
         // download enabled?
-        switch ((<IProvider>this.extension.provider).type) {
+        switch (this.extension.provider.type) {
             case "book":
                 if (this.extension.provider.config.options.bookDownloadEnabled === false) {
                     return false;
@@ -87,7 +87,7 @@ class Behaviours {
     updateSlidingExpiration(): void {
 
         // not necessary if content is all open.
-        if ((<IProvider>this.extension.provider).pkg.extensions.isAllOpen) return;
+        if (this.extension.provider.pkg.extensions.isAllOpen) return;
 
         // some (or all) of the content requires login.
         // if the user has a session, update the sliding expiration.
