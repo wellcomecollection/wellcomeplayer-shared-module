@@ -11,8 +11,6 @@ class Behaviours {
 	
 	sessionTimer: any;
 
-	static CLOSE_ACTIVE_DIALOGUE: string = 'onCloseActiveDialogue';
-
 	constructor(public extension: IWellcomeExtension){
 
 	}
@@ -80,10 +78,6 @@ class Behaviours {
         }
     }
 
-    closeActiveDialogue(): void{
-    	$.publish(Behaviours.CLOSE_ACTIVE_DIALOGUE);
-    }
-    
     updateSlidingExpiration(): void {
 
         // not necessary if content is all open.
