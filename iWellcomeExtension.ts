@@ -17,8 +17,8 @@ interface IWellcomeExtension extends IExtension{
 	allowCloseLogin(): boolean;
 	updateSlidingExpiration(): void;
 	closeActiveDialogue(): void;
-	trackAction(category: string, action: string): void;
-	getTrackActionLabel(): string;
+	trackEvent(category: string, action: string, label: string): void;
+	trackVariable(slot: number, name: string, value: string, scope: number): void;
 	isSaveToLightboxEnabled(): boolean;
 	isDownloadEnabled(): boolean;
 }

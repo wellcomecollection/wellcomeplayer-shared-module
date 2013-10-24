@@ -11,6 +11,9 @@ class Behaviours {
 	
 	sessionTimer: any;
 
+    static TRACK_EVENT: string = 'onTrackEvent';
+    static TRACK_VARIABLE: string = 'onTrackVariable';
+
 	constructor(public extension: IWellcomeExtension){
 
 	}
@@ -53,29 +56,18 @@ class Behaviours {
         return true;
     }
 
-    getTrackActionLabel(): string {
-        return      "bNumber: " + this.extension.provider.pkg.identifier 
-                + ", type: " + this.extension.provider.type 
-                + ", assetSequenceIndex: " + this.extension.provider.assetSequenceIndex
-                + ", asset: " + this.extension.currentAssetIndex 
-                + ", isLoggedIn: " + this.isLoggedIn() 
-                + ", isHomeDomain: " + this.extension.provider.isHomeDomain 
-                + ", uri: " + window.parent.location;
-    }
-
-    trackAction(category: string, action: string): void{
-    	var label = this.getTrackActionLabel();
-
-        //log(category, action, label);
+    trackEvent(category: string, action: string, label: string): void{
 
         // update sliding session expiration.
         this.updateSlidingExpiration();
 
-        try {
-            trackEvent(category, action, label);
-        } catch (e) {
-            // do nothing
-        }
+        this.extension.triggerSocket(Behaviours.TRACK_EVENT, 
+            {category: category, action: action, label: label});
+    }
+
+    trackVariable(slot: number, name: string, value: string, scope: number): void{
+        this.extension.triggerSocket(Behaviours.TRACK_VARIABLE, 
+            {slot: slot, name: name, value: value, scope: scope});
     }
 
     updateSlidingExpiration(): void {
@@ -216,8 +208,13 @@ class Behaviours {
                 $.publish(login.LoginDialogue.HIDE_LOGIN_DIALOGUE);
 
                 if (result.Message.toLowerCase() == "success") {
+                    
                     this.extension.triggerSocket(login.LoginDialogue.LOGIN, result.DisplayNameBase64);
+                    
+                    this.trackVariable(1, 'Logged in', 'true', 2);
+
                     params.successCallback(true);
+
                 } else {
                     params.failureCallback(result.Message, true);
                 }
