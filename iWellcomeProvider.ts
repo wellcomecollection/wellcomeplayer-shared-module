@@ -3,6 +3,9 @@
 import IProvider = require("../coreplayer-shared-module/iProvider");
 
 interface IWellcomeProvider extends IProvider{
+	
+	moreInfo: any;
+
 	getMoreInfoUri(): string;
 	getPrefetchUri(asset: any): string;
 	getAssetUri(asset: any): string;

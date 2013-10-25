@@ -17,8 +17,21 @@ class Behaviours {
 	constructor(public extension: IWellcomeExtension){
         
         $.subscribe(baseExtension.BaseExtension.CREATED, () => {
-            this.trackEvent('Asset Sequences', 'Viewed', this.extension.provider.type, '');
+            
+            var moreInfo = (<IWellcomeProvider>this.extension.provider).moreInfo;
 
+            var format = 'n/a';
+            var institution = 'n/a';
+            var identifier = 'n/a';
+
+            if (moreInfo){
+                if (moreInfo.bibDocType) format = moreInfo.bibDocType;
+                if (moreInfo.Institution) institution = moreInfo.Institution;
+                if (moreInfo.marc759a) identifier = moreInfo.marc759a;                
+            }
+            
+            this.trackEvent('Asset Sequences', 'Viewed', 'Format: ' + format + ', Institution: ' + institution + ', Identifier: ' + identifier, '');
+            
             if (!this.extension.provider.isHomeDomain){
                 this.trackVariable(2, 'Embedded', this.extension.provider.domain, 2);
             }
