@@ -17,10 +17,13 @@ interface IWellcomeExtension extends IExtension{
 	allowCloseLogin(): boolean;
 	updateSlidingExpiration(): void;
 	closeActiveDialogue(): void;
-	trackEvent(category: string, action: string, label: string): void;
+	trackEvent(category: string, action: string, label: string, value: string): void;
 	trackVariable(slot: number, name: string, value: string, scope: number): void;
 	isSaveToLightboxEnabled(): boolean;
 	isDownloadEnabled(): boolean;
+
+	$embedDialogue: JQuery;
+	$downloadDialogue: JQuery;
 }
 
 export = IWellcomeExtension;

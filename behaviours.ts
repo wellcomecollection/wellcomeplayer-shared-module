@@ -15,7 +15,30 @@ class Behaviours {
     static TRACK_VARIABLE: string = 'onTrackVariable';
 
 	constructor(public extension: IWellcomeExtension){
+        
+        $.subscribe(baseExtension.BaseExtension.CREATED, () => {
+            this.trackEvent('Asset Sequences', 'Viewed', this.extension.provider.type, '');
 
+            if (!this.extension.provider.isHomeDomain){
+                this.trackVariable(2, 'Embedded', this.extension.provider.domain, 2);
+            }
+
+            this.extension.$embedDialogue.find('.close').on('click', () => {
+                this.trackEvent('Interactions', 'Embed', 'Closed', '');
+            });
+
+            this.extension.$downloadDialogue.find('.close').on('click', () => {
+                this.trackEvent('Interactions', 'Download', 'Closed', '');
+            });
+        });
+
+        $.subscribe(baseExtension.BaseExtension.TOGGLE_FULLSCREEN, () => {
+            if (this.extension.isFullScreen) {
+                this.trackEvent('Interactions', 'Full Screen', 'Exit', '');
+            } else {
+                this.trackEvent('Interactions', 'Full Screen', 'Enter', '');
+            }
+        });
 	}
 
 	isSaveToLightboxEnabled(): boolean {
@@ -56,18 +79,16 @@ class Behaviours {
         return true;
     }
 
-    trackEvent(category: string, action: string, label: string): void{
+    trackEvent(category: string, action: string, label: string, value: string): void{
 
         // update sliding session expiration.
         this.updateSlidingExpiration();
 
-        this.extension.triggerSocket(Behaviours.TRACK_EVENT, 
-            {category: category, action: action, label: label});
+        window.trackEvent(category, action, label, value);
     }
 
     trackVariable(slot: number, name: string, value: string, scope: number): void{
-        this.extension.triggerSocket(Behaviours.TRACK_VARIABLE, 
-            {slot: slot, name: name, value: value, scope: scope});
+        window.trackVariable(slot, name, value, scope);
     }
 
     updateSlidingExpiration(): void {
@@ -311,6 +332,8 @@ class Behaviours {
                     
                     this.extension.currentAssetIndex = assetIndex;
                     $.publish(baseExtension.BaseExtension.ASSET_INDEX_CHANGED, [assetIndex]);
+
+                    this.trackEvent('Assets', 'Viewed', String(assetIndex), '');
 
                     if (successCallback) {
                         successCallback(assetIndex);
