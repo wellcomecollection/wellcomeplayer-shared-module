@@ -29,27 +29,27 @@ class Behaviours {
                 if (moreInfo.Institution) institution = moreInfo.Institution;
                 if (moreInfo.marc759a) identifier = moreInfo.marc759a;                
             }
-            
-            this.trackEvent('Asset Sequences', 'Viewed', 'Format: ' + format + ', Institution: ' + institution + ', Identifier: ' + identifier, '');
+
+            this.trackEvent('Items', 'Viewed', 'BNumber: ' + this.extension.provider.assetSequence.packageIdentifier + ', Format: ' + format + ', Institution: ' + institution + ', Identifier: ' + identifier, '');
             
             if (!this.extension.provider.isHomeDomain){
                 this.trackVariable(2, 'Embedded', this.extension.provider.domain, 2);
             }
 
             this.extension.$embedDialogue.find('.close').on('click', () => {
-                this.trackEvent('Interactions', 'Embed', 'Closed', '');
+                this.trackEvent('Player Interactions', 'Embed', 'Closed', '');
             });
 
             this.extension.$downloadDialogue.find('.close').on('click', () => {
-                this.trackEvent('Interactions', 'Download', 'Closed', '');
+                this.trackEvent('Player Interactions', 'Download', 'Closed', '');
             });
         });
 
         $.subscribe(baseExtension.BaseExtension.TOGGLE_FULLSCREEN, () => {
             if (this.extension.isFullScreen) {
-                this.trackEvent('Interactions', 'Full Screen', 'Exit', '');
+                this.trackEvent('Player Interactions', 'Full Screen', 'Exit', '');
             } else {
-                this.trackEvent('Interactions', 'Full Screen', 'Enter', '');
+                this.trackEvent('Player Interactions', 'Full Screen', 'Enter', '');
             }
         });
 	}
@@ -346,7 +346,7 @@ class Behaviours {
                     this.extension.currentAssetIndex = assetIndex;
                     $.publish(baseExtension.BaseExtension.ASSET_INDEX_CHANGED, [assetIndex]);
 
-                    this.trackEvent('Assets', 'Viewed', String(assetIndex), '');
+                    this.trackEvent('Assets', 'Viewed', this.extension.provider.assetSequence.packageIdentifier + ': ' + String(assetIndex), '');
 
                     if (successCallback) {
                         successCallback(assetIndex);
