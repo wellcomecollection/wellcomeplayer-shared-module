@@ -6,6 +6,14 @@ import IWellcomeProvider = require("./iWellcomeProvider");
 import restrictedFile = require("../wellcomeplayer-dialogues-module/restrictedFileDialogue");
 import login = require("../wellcomeplayer-dialogues-module/loginDialogue");
 import baseExtension = require("../coreplayer-shared-module/baseExtension");
+import baseFooter = require("../coreplayer-shared-module/footerPanel");
+import footer = require("../wellcomeplayer-extendedfooterpanel-module/footerPanel");
+import help = require("../coreplayer-dialogues-module/helpDialogue");
+import conditions = require("../wellcomeplayer-dialogues-module/conditionsDialogue");
+import baseLeft = require("../coreplayer-shared-module/leftPanel");
+import left = require("../coreplayer-treeviewleftpanel-module/treeViewLeftPanel");
+import baseRight = require("../coreplayer-shared-module/rightPanel");
+import coreMediaElementExtension = require("../../extensions/coreplayer-mediaelement-extension/extension");
 
 class Behaviours {
 	
@@ -16,40 +24,120 @@ class Behaviours {
 
 	constructor(public extension: IWellcomeExtension){
         
+        // track events
         $.subscribe(baseExtension.BaseExtension.CREATED, () => {
-            
-            var moreInfo = (<IWellcomeProvider>this.extension.provider).moreInfo;
 
-            var format = 'n/a';
-            var institution = 'n/a';
-            var identifier = 'n/a';
-
-            if (moreInfo){
-                if (moreInfo.bibDocType) format = moreInfo.bibDocType;
-                if (moreInfo.Institution) institution = moreInfo.Institution;
-                if (moreInfo.marc759a) identifier = moreInfo.marc759a;                
-            }
-
-            this.trackEvent('Items', 'Viewed', 'BNumber: ' + this.extension.provider.assetSequence.packageIdentifier + ', Format: ' + format + ', Institution: ' + institution + ', Identifier: ' + identifier, '');
+            this.trackEvent('Pages', 'Viewed', '');
             
             if (!this.extension.provider.isHomeDomain){
                 this.trackVariable(2, 'Embedded', this.extension.provider.domain, 2);
             }
 
             this.extension.$embedDialogue.find('.close').on('click', () => {
-                this.trackEvent('Player Interactions', 'Embed', 'Closed', '');
+                this.trackEvent('Player Interactions', 'Embed', 'Closed');
             });
 
             this.extension.$downloadDialogue.find('.close').on('click', () => {
-                this.trackEvent('Player Interactions', 'Download', 'Closed', '');
+                this.trackEvent('Player Interactions', 'Download', 'Closed');
             });
+
+            this.extension.$helpDialogue.find('.close').on('click', () => {
+                this.trackEvent('Player Interactions', 'Help', 'Closed');
+            });
+
+            this.extension.$conditionsDialogue.find('.close').on('click', () => {
+                this.trackEvent('Player Interactions', 'Conditions', 'Closed');
+            });
+
+            if (this.extension.$restrictedFileDialogue){
+                this.extension.$restrictedFileDialogue.find('.close').on('click', () => {
+                    this.trackEvent('Player Interactions', 'Restricted File', 'Closed');
+                });
+            }
+
+            var seeAlso = this.extension.provider.getSeeAlso();
+
+            if (seeAlso && this.extension.isSeeAlsoEnabled()){
+                $.publish(baseExtension.BaseExtension.SHOW_MESSAGE, [seeAlso.markup]);                
+            }
+        });
+        
+        $.subscribe(help.HelpDialogue.SHOW_HELP_DIALOGUE, () => {
+            this.trackEvent('Player Interactions', 'Help', 'Opened', '');
+        });
+
+        $.subscribe(conditions.ConditionsDialogue.SHOW_CONDITIONS_DIALOGUE, () => {
+            this.trackEvent('Player Interactions', 'Conditions', 'Opened', '');
+        });
+
+        $.subscribe(footer.FooterPanel.DOWNLOAD, () => {
+            this.trackEvent('Player Interactions', 'Download', 'Opened', '');
+        });
+
+        $.subscribe(footer.FooterPanel.SAVE, () => {
+            this.trackEvent('Player Interactions', 'Save to Lightbox', 'Opened', '');
+        });
+
+        $.subscribe(baseFooter.FooterPanel.EMBED, () => {
+            this.trackEvent('Player Interactions', 'Embed', 'Opened', '');
         });
 
         $.subscribe(baseExtension.BaseExtension.TOGGLE_FULLSCREEN, () => {
             if (this.extension.isFullScreen) {
-                this.trackEvent('Player Interactions', 'Full Screen', 'Exit', '');
+                this.trackEvent('Player Interactions', 'Full Screen', 'Exit');
             } else {
-                this.trackEvent('Player Interactions', 'Full Screen', 'Enter', '');
+                this.trackEvent('Player Interactions', 'Full Screen', 'Enter');
+            }
+        });
+
+        $.subscribe(baseLeft.LeftPanel.OPEN_LEFT_PANEL, () => {
+            this.trackEvent('Player Interactions', 'Left Panel', 'Opened');
+        });
+
+        $.subscribe(baseLeft.LeftPanel.CLOSE_LEFT_PANEL, () => {
+            this.trackEvent('Player Interactions', 'Left Panel', 'Closed');
+        });
+
+        $.subscribe(left.TreeViewLeftPanel.OPEN_TREE_VIEW, () => {
+            this.trackEvent('Player Interactions', 'Tree', 'Opened');
+        });
+
+        $.subscribe(left.TreeViewLeftPanel.OPEN_THUMBS_VIEW, () => {
+            this.trackEvent('Player Interactions', 'Thumbs', 'Opened');
+        });
+
+        $.subscribe(baseRight.RightPanel.OPEN_RIGHT_PANEL, () => {
+            this.trackEvent('Player Interactions', 'Right Panel', 'Opened');
+        });
+
+        $.subscribe(baseRight.RightPanel.CLOSE_RIGHT_PANEL, () => {
+            this.trackEvent('Player Interactions', 'Right Panel', 'Closed');
+        });
+
+        $.subscribe(restrictedFile.RestrictedFileDialogue.SHOW_RESTRICTED_FILE_DIALOGUE, () => {
+            this.trackEvent('Player Interactions', 'Restricted File', 'Opened');
+        });
+
+        $.subscribe(coreMediaElementExtension.Extension.MEDIA_PLAYED, () => {
+            this.trackEvent('Player Interactions', 'Play');
+        });
+
+        $.subscribe(coreMediaElementExtension.Extension.MEDIA_PAUSED, () => {
+            this.trackEvent('Player Interactions', 'Pause');
+        });
+
+        $.subscribe(coreMediaElementExtension.Extension.MEDIA_ENDED, () => {
+            this.trackEvent('Player Interactions', 'Ended');
+        });
+
+        // see also
+        $.subscribe(baseExtension.BaseExtension.ASSET_INDEX_CHANGED, () => {
+            var seeAlso = this.extension.getCurrentAsset().seeAlso;
+
+            if (seeAlso && this.extension.isSeeAlsoEnabled()){
+                $.publish(baseExtension.BaseExtension.SHOW_MESSAGE, [seeAlso.markup]);
+            } else {
+                $.publish(baseExtension.BaseExtension.HIDE_MESSAGE);
             }
         });
 	}
@@ -92,16 +180,43 @@ class Behaviours {
         return true;
     }
 
-    trackEvent(category: string, action: string, label: string, value: string): void{
+    trackEvent(category: string, action: string, label?: string, value?: string): void{
 
         // update sliding session expiration.
         this.updateSlidingExpiration();
+
+        if (!label) {
+            label = this.getGenericTrackingLabel();
+        } else {
+            label += ', ' + this.getGenericTrackingLabel();
+        }
 
         window.trackEvent(category, action, label, value);
     }
 
     trackVariable(slot: number, name: string, value: string, scope: number): void{
         window.trackVariable(slot, name, value, scope);
+    }
+
+    getGenericTrackingLabel(): string{
+        var moreInfo = (<IWellcomeProvider>this.extension.provider).moreInfo;
+
+        var format = 'n/a';
+        var institution = 'n/a';
+        var identifier = this.extension.provider.assetSequence.packageIdentifier;
+        var digicode = 'n/a';
+        var collectioncode = 'n/a';
+
+        if (moreInfo){
+            if (moreInfo.bibDocType) format = moreInfo.bibDocType;
+            if (moreInfo.Institution) institution = moreInfo.Institution;
+            if (moreInfo.marc759a) digicode = moreInfo.marc759a; 
+            if (moreInfo.marc905a) collectioncode = moreInfo.marc905a;
+
+            return 'Format: ' + format + ', Institution: ' + institution + ', Identifier: ' + identifier + ', Digicode: ' + digicode + ', Collection code: ' + collectioncode;               
+        }
+        
+        return '';
     }
 
     updateSlidingExpiration(): void {
@@ -346,7 +461,7 @@ class Behaviours {
                     this.extension.currentAssetIndex = assetIndex;
                     $.publish(baseExtension.BaseExtension.ASSET_INDEX_CHANGED, [assetIndex]);
 
-                    this.trackEvent('Assets', 'Viewed', this.extension.provider.assetSequence.packageIdentifier + ': ' + String(assetIndex), '');
+                    this.trackEvent('Items', 'Viewed', 'Index: ' + String(assetIndex));
 
                     if (successCallback) {
                         successCallback(assetIndex);

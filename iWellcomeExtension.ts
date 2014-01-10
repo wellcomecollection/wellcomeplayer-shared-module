@@ -24,6 +24,9 @@ interface IWellcomeExtension extends IExtension{
 
 	$embedDialogue: JQuery;
 	$downloadDialogue: JQuery;
+	$helpDialogue: JQuery;
+	$conditionsDialogue: JQuery;
+	$restrictedFileDialogue: JQuery;
 }
 
 export = IWellcomeExtension;
