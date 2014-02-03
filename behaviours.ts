@@ -16,19 +16,19 @@ import baseRight = require("../coreplayer-shared-module/rightPanel");
 import coreMediaElementExtension = require("../../extensions/coreplayer-mediaelement-extension/extension");
 
 class Behaviours {
-	
+
 	sessionTimer: any;
 
     static TRACK_EVENT: string = 'onTrackEvent';
     static TRACK_VARIABLE: string = 'onTrackVariable';
 
 	constructor(public extension: IWellcomeExtension){
-        
+
         // track events
         $.subscribe(baseExtension.BaseExtension.CREATED, () => {
 
             this.trackEvent('Pages', 'Viewed', '');
-            
+
             if (!this.extension.provider.isHomeDomain){
                 this.trackVariable(2, 'Embedded', this.extension.provider.domain, 2);
             }
@@ -58,10 +58,10 @@ class Behaviours {
             var seeAlso = this.extension.provider.getSeeAlso();
 
             if (seeAlso && this.extension.isSeeAlsoEnabled()){
-                $.publish(baseExtension.BaseExtension.SHOW_MESSAGE, [seeAlso.markup]);                
+                $.publish(baseExtension.BaseExtension.SHOW_MESSAGE, [seeAlso.markup]);
             }
         });
-        
+
         $.subscribe(help.HelpDialogue.SHOW_HELP_DIALOGUE, () => {
             this.trackEvent('Player Interactions', 'Help', 'Opened', '');
         });
@@ -210,12 +210,12 @@ class Behaviours {
         if (moreInfo){
             if (moreInfo.bibDocType) format = moreInfo.bibDocType;
             if (moreInfo.Institution) institution = moreInfo.Institution;
-            if (moreInfo.marc759a) digicode = moreInfo.marc759a; 
+            if (moreInfo.marc759a) digicode = moreInfo.marc759a;
             if (moreInfo.marc905a) collectioncode = moreInfo.marc905a;
 
-            return 'Format: ' + format + ', Institution: ' + institution + ', Identifier: ' + identifier + ', Digicode: ' + digicode + ', Collection code: ' + collectioncode;               
+            return 'Format: ' + format + ', Institution: ' + institution + ', Identifier: ' + identifier + ', Digicode: ' + digicode + ', Collection code: ' + collectioncode;
         }
-        
+
         return '';
     }
 
@@ -353,13 +353,13 @@ class Behaviours {
             xhrFields: { withCredentials: true },
             // success callback
             success: (result: any) => {
-                
+
                 $.publish(login.LoginDialogue.HIDE_LOGIN_DIALOGUE);
 
                 if (result.Message.toLowerCase() == "success") {
-                    
+
                     this.extension.triggerSocket(login.LoginDialogue.LOGIN, result.DisplayNameBase64);
-                    
+
                     this.trackVariable(1, 'Logged in', 'true', 2);
 
                     params.successCallback(true);
@@ -436,11 +436,12 @@ class Behaviours {
 
         var prefetchUri = this.extension.provider.getPrefetchUri(asset);
 
-        $.getJSON(prefetchUri, function (result) {
+        $.getJSON(prefetchUri, (result) => {
             if (result.Success) {
                 successCallback(asset.fileUri);
             } else {
-                console.log(result.Message);
+                this.extension.showDialogue(result.Message);
+                return;
             }
         });
     }
@@ -457,7 +458,7 @@ class Behaviours {
                         this.viewIndex(assetIndex, successCallback);
                     });
                 } else {
-                    
+
                     this.extension.currentAssetIndex = assetIndex;
                     $.publish(baseExtension.BaseExtension.ASSET_INDEX_CHANGED, [assetIndex]);
 
