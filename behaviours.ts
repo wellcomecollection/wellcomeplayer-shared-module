@@ -33,6 +33,10 @@ class Behaviours {
                 this.trackVariable(2, 'Embedded', this.extension.provider.domain, 2);
             }
 
+            this.extension.$loginDialogue.find('.close').on('click', () => {
+                this.trackEvent('Player Interactions', 'Log in', 'Closed');
+            });
+
             this.extension.$embedDialogue.find('.close').on('click', () => {
                 this.trackEvent('Player Interactions', 'Embed', 'Closed');
             });
@@ -60,6 +64,10 @@ class Behaviours {
             if (seeAlso && this.extension.isSeeAlsoEnabled()){
                 $.publish(baseExtension.BaseExtension.SHOW_MESSAGE, [seeAlso.markup]);
             }
+        });
+
+        $.subscribe(login.LoginDialogue.SHOW_LOGIN_DIALOGUE, () => {
+            this.trackEvent('Player Interactions', 'Log in', 'Opened');
         });
 
         $.subscribe(help.HelpDialogue.SHOW_HELP_DIALOGUE, () => {
@@ -191,7 +199,7 @@ class Behaviours {
             label += ', ' + this.getGenericTrackingLabel();
         }
 
-        if (typeof(value) === 'undefined'){
+        if (!value){
             window.trackEvent(category, action, label);
         } else {
             window.trackEvent(category, action, label, parseInt(value));

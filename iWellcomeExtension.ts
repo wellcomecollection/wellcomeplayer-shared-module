@@ -22,6 +22,7 @@ interface IWellcomeExtension extends IExtension{
 	isSaveToLightboxEnabled(): boolean;
 	isDownloadEnabled(): boolean;
 
+	$loginDialogue: JQuery;
 	$embedDialogue: JQuery;
 	$downloadDialogue: JQuery;
 	$helpDialogue: JQuery;
