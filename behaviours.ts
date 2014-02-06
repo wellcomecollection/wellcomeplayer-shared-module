@@ -180,7 +180,7 @@ class Behaviours {
         return true;
     }
 
-    trackEvent(category: string, action: string, label?: string, value?: string): void{
+    trackEvent(category: string, action: string, label?: string, value?: any): void{
 
         // update sliding session expiration.
         this.updateSlidingExpiration();
@@ -191,7 +191,11 @@ class Behaviours {
             label += ', ' + this.getGenericTrackingLabel();
         }
 
-        window.trackEvent(category, action, label, value);
+        if (typeof(value) === 'undefined'){
+            window.trackEvent(category, action, label);
+        } else {
+            window.trackEvent(category, action, label, parseInt(value));
+        }
     }
 
     trackVariable(slot: number, name: string, value: string, scope: number): void{
