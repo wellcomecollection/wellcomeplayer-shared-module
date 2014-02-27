@@ -27,7 +27,7 @@ class Behaviours {
         // track events
         $.subscribe(baseExtension.BaseExtension.CREATED, () => {
 
-            this.trackEvent('Pages', 'Viewed', '');
+            this.trackEvent('Items', 'Viewed', '');
 
             if (!this.extension.provider.isHomeDomain){
                 this.trackVariable(2, 'Embedded', this.extension.provider.domain, 2);
@@ -474,7 +474,7 @@ class Behaviours {
                     this.extension.currentAssetIndex = assetIndex;
                     $.publish(baseExtension.BaseExtension.ASSET_INDEX_CHANGED, [assetIndex]);
 
-                    this.trackEvent('Items', 'Viewed', 'Index: ' + String(assetIndex));
+                    this.trackEvent('Pages', 'Viewed', 'Index: ' + String(assetIndex));
 
                     if (successCallback) {
                         successCallback(assetIndex);
