@@ -14,6 +14,7 @@ import baseLeft = require("../coreplayer-shared-module/leftPanel");
 import left = require("../coreplayer-treeviewleftpanel-module/treeViewLeftPanel");
 import baseRight = require("../coreplayer-shared-module/rightPanel");
 import coreMediaElementExtension = require("../../extensions/coreplayer-mediaelement-extension/extension");
+import download = require("../wellcomeplayer-dialogues-module/downloadDialogue");
 
 class Behaviours {
 
@@ -80,6 +81,42 @@ class Behaviours {
 
         $.subscribe(footer.FooterPanel.DOWNLOAD, () => {
             this.trackEvent('Player Interactions', 'Download', 'Opened', '');
+        });
+
+        $.subscribe(download.DownloadDialogue.PREVIEW, (e, type) => {
+
+            switch (type){
+                case "currentViewAsJpg":
+                    this.trackEvent('Files', 'Previewed - Current View');
+                    break;
+                case "wholeImageHighResAsJpg":
+                    this.trackEvent('Files', 'Previewed - Whole Image High Res');
+                    break;
+                case "wholeImageLowResAsJpg":
+                    this.trackEvent('Files', 'Previewed - Whole Image Low Res');
+                    break;
+                case "entireDocumentAsPdf":
+                    this.trackEvent('Files', 'Previewed - Entire Document As PDF');
+                    break;
+            }
+        });
+
+        $.subscribe(download.DownloadDialogue.DOWNLOAD, (e, type) => {
+
+            switch (type){
+                case "currentViewAsJpg":
+                    this.trackEvent('Files', 'Downloaded - Current View');
+                    break;
+                case "wholeImageHighResAsJpg":
+                    this.trackEvent('Files', 'Downloaded - Whole Image High Res');
+                    break;
+                case "wholeImageLowResAsJpg":
+                    this.trackEvent('Files', 'Downloaded - Whole Image Low Res');
+                    break;
+                case "entireDocumentAsPdf":
+                    this.trackEvent('Files', 'Downloaded - Entire Document As PDF');
+                    break;
+            }
         });
 
         $.subscribe(footer.FooterPanel.SAVE, () => {
