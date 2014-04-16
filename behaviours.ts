@@ -456,12 +456,25 @@ class Behaviours {
                         });
                     }
                 } else {
-                    this.showLoginDialogue({
-                        successCallback: successCallback,
-                        failureCallback: failureCallback,
-                        requestedIndex: assetIndex,
-                        allowClose: this.allowCloseLogin()
-                    });
+                    // if section is 'requires registration', show login as guest option.
+                    if (section.extensions.accessCondition.toLowerCase() === "requires registration"){
+                        this.showLoginDialogue({
+                            successCallback: successCallback,
+                            failureCallback: failureCallback,
+                            requestedIndex: assetIndex,
+                            allowClose: this.allowCloseLogin(),
+                            allowGuestLogin: true
+                        });
+                    } else {
+                        // don't allow guest login.
+                        this.showLoginDialogue({
+                            successCallback: successCallback,
+                            failureCallback: failureCallback,
+                            requestedIndex: assetIndex,
+                            allowClose: this.allowCloseLogin(),
+                            allowGuestLogin: false
+                        });
+                    }
                 }
                 break;
             case 'expired':
