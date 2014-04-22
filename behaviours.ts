@@ -262,7 +262,12 @@ class Behaviours {
             if (moreInfo.marc759a) digicode = moreInfo.marc759a;
             if (moreInfo.marc905a) collectioncode = moreInfo.marc905a;
 
-            return 'Format: ' + format + ', Institution: ' + institution + ', Identifier: ' + identifier + ', Digicode: ' + digicode + ', Collection code: ' + collectioncode;
+            return  'Format: ' + format +
+                    ', Institution: ' + institution +
+                    ', Identifier: ' + identifier +
+                    ', Digicode: ' + digicode +
+                    ', Collection code: ' + collectioncode +
+                    ', Uri: ' + parent.document.URL;
         }
 
         return '';
@@ -320,13 +325,13 @@ class Behaviours {
 
         switch (section.extensions.accessCondition.toLowerCase()) {
             case 'requires registration':
-                return this.extension.provider.config.modules.loginDialogue.requiresRegistrationPermissionsMessage;
+                return this.extension.provider.config.modules.loginDialogue.content.requiresRegistrationPermissionsMessage;
             case 'clinical images':
-                return this.extension.provider.config.modules.loginDialogue.clinicalImagesPermissionsMessage;
+                return this.extension.provider.config.modules.loginDialogue.content.clinicalImagesPermissionsMessage;
             case 'restricted files':
-                return this.extension.provider.config.modules.loginDialogue.restrictedFilesPermissionsMessage;
+                return this.extension.provider.config.modules.loginDialogue.content.restrictedFilesPermissionsMessage;
             case 'closed':
-                return this.extension.provider.config.modules.loginDialogue.closedPermissionsMessage;
+                return this.extension.provider.config.modules.loginDialogue.content.closedPermissionsMessage;
         }
 
         return this.extension.provider.config.modules.loginDialogue.inadequatePermissionsMessage;
@@ -463,7 +468,8 @@ class Behaviours {
                             failureCallback: failureCallback,
                             requestedIndex: assetIndex,
                             allowClose: this.allowCloseLogin(),
-                            allowGuestLogin: true
+                            allowGuestLogin: true,
+                            message: this.getInadequatePermissionsMessage(assetIndex)
                         });
                     } else {
                         // don't allow guest login.
@@ -472,7 +478,8 @@ class Behaviours {
                             failureCallback: failureCallback,
                             requestedIndex: assetIndex,
                             allowClose: this.allowCloseLogin(),
-                            allowGuestLogin: false
+                            allowGuestLogin: false,
+                            message: this.getInadequatePermissionsMessage(assetIndex)
                         });
                     }
                 }
