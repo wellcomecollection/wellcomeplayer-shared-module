@@ -62,7 +62,7 @@ class Behaviours {
 
             var seeAlso = this.extension.provider.getSeeAlso();
 
-            if (seeAlso && this.extension.isSeeAlsoEnabled()){
+            if (seeAlso && this.extension.provider.isSeeAlsoEnabled()){
                 $.publish(baseExtension.BaseExtension.SHOW_MESSAGE, [seeAlso.markup]);
             }
         });
@@ -176,10 +176,10 @@ class Behaviours {
         });
 
         // see also
-        $.subscribe(baseExtension.BaseExtension.ASSET_INDEX_CHANGED, () => {
-            var seeAlso = this.extension.getCurrentAsset().seeAlso;
+        $.subscribe(baseExtension.BaseExtension.CANVAS_INDEX_CHANGED, () => {
+            var seeAlso = this.extension.provider.getCurrentCanvas().seeAlso;
 
-            if (seeAlso && this.extension.isSeeAlsoEnabled()){
+            if (seeAlso && this.extension.provider.isSeeAlsoEnabled()){
                 $.publish(baseExtension.BaseExtension.SHOW_MESSAGE, [seeAlso.markup]);
             } else {
                 $.publish(baseExtension.BaseExtension.HIDE_MESSAGE);
@@ -218,7 +218,7 @@ class Behaviours {
         }
 
         // download available?
-        if (!this.extension.provider.assetSequence.extensions.permittedOperations.length) {
+        if (!this.extension.provider.sequence.extensions.permittedOperations.length) {
             return false;
         }
 
@@ -252,7 +252,7 @@ class Behaviours {
 
         var format = 'n/a';
         var institution = 'n/a';
-        var identifier = this.extension.provider.assetSequence.packageIdentifier;
+        var identifier = this.extension.provider.sequence.packageIdentifier;
         var digicode = 'n/a';
         var collectioncode = 'n/a';
 
@@ -276,7 +276,7 @@ class Behaviours {
     updateSlidingExpiration(): void {
 
         // not necessary if content is all open.
-        if (this.extension.provider.pkg.extensions.isAllOpen) return;
+        if (this.extension.provider.manifest.extensions.isAllOpen) return;
 
         // some (or all) of the content requires login.
         // if the user has a session, update the sliding expiration.
@@ -316,12 +316,12 @@ class Behaviours {
         // so don't allow it to be closed.
         // necessary for video/audio which have no ui to trigger
         // new login event.
-        return this.extension.provider.assetSequence.assets.length != 1;
+        return this.extension.provider.sequence.assets.length != 1;
     }
 
-    getInadequatePermissionsMessage(assetIndex): string {
+    getInadequatePermissionsMessage(canvasIndex): string {
 
-        var section = this.extension.getSectionByAssetIndex(assetIndex);
+        var section = this.extension.provider.getStructureByCanvasIndex(canvasIndex);
 
         switch (section.extensions.accessCondition.toLowerCase()) {
             case 'requires registration':
@@ -341,9 +341,9 @@ class Behaviours {
         $.publish(restrictedFile.RestrictedFileDialogue.SHOW_RESTRICTED_FILE_DIALOGUE, [params]);
     }
 
-    isAuthorised(assetIndex): boolean {
+    isAuthorised(canvasIndex): boolean {
 
-        var section = this.extension.getSectionByAssetIndex(assetIndex);
+        var section = this.extension.provider.getStructureByCanvasIndex(canvasIndex);
 
         if (section.extensions.authStatus.toLowerCase() == "allowed") {
             return true;
@@ -353,7 +353,7 @@ class Behaviours {
     }
 
     hasPermissionToViewCurrentItem(): boolean{
-        return this.isAuthorised(this.extension.currentAssetIndex);
+        return this.isAuthorised(this.extension.provider.canvasIndex);
     }
 
     isLoggedIn(): boolean {
@@ -372,7 +372,7 @@ class Behaviours {
     // pass direction as 1 or -1.
     nextAvailableIndex(direction: number, requestedIndex: number) {
 
-        for (var i = requestedIndex; i < this.extension.provider.assetSequence.assets.length && i >= 0; i += direction) {
+        for (var i = requestedIndex; i < this.extension.provider.sequence.assets.length && i >= 0; i += direction) {
             if (i == requestedIndex) continue;
             if (this.isAuthorised(i)) {
                 return i;
@@ -386,7 +386,7 @@ class Behaviours {
 
         var nextAvailableIndex;
 
-        if (requestedIndex < this.extension.currentAssetIndex) {
+        if (requestedIndex < this.extension.provider.canvasIndex) {
             nextAvailableIndex = this.nextAvailableIndex(-1, requestedIndex);
         } else {
             nextAvailableIndex = this.nextAvailableIndex(1, requestedIndex);
@@ -433,9 +433,9 @@ class Behaviours {
         $.ajax(ajaxOptions);
     }
 
-    authorise(assetIndex: number, successCallback: any, failureCallback: any): void {
+    authorise(canvasIndex: number, successCallback: any, failureCallback: any): void {
 
-        var section = this.extension.getSectionByAssetIndex(assetIndex);
+        var section = this.extension.provider.getStructureByCanvasIndex(canvasIndex);
 
         switch (section.extensions.authStatus.toLowerCase()) {
             case 'allowed':
@@ -447,7 +447,7 @@ class Behaviours {
                     // credentials to view it, so show restricted file dialogue.
                     if (section.extensions.accessCondition.toLowerCase() === "restricted files") {
                         this.showRestrictedFileDialogue({
-                            requestedIndex: assetIndex,
+                            requestedIndex: canvasIndex,
                             allowClose: this.allowCloseLogin()
                         });
                     } else {
@@ -455,9 +455,9 @@ class Behaviours {
                             successCallback: successCallback,
                             failureCallback: failureCallback,
                             inadequatePermissions: true,
-                            requestedIndex: assetIndex,
+                            requestedIndex: canvasIndex,
                             allowClose: this.allowCloseLogin(),
-                            message: this.getInadequatePermissionsMessage(assetIndex)
+                            message: this.getInadequatePermissionsMessage(canvasIndex)
                         });
                     }
                 } else {
@@ -466,20 +466,20 @@ class Behaviours {
                         this.showLoginDialogue({
                             successCallback: successCallback,
                             failureCallback: failureCallback,
-                            requestedIndex: assetIndex,
+                            requestedIndex: canvasIndex,
                             allowClose: this.allowCloseLogin(),
                             allowGuestLogin: true,
-                            message: this.getInadequatePermissionsMessage(assetIndex)
+                            message: this.getInadequatePermissionsMessage(canvasIndex)
                         });
                     } else {
                         // don't allow guest login.
                         this.showLoginDialogue({
                             successCallback: successCallback,
                             failureCallback: failureCallback,
-                            requestedIndex: assetIndex,
+                            requestedIndex: canvasIndex,
                             allowClose: this.allowCloseLogin(),
                             allowGuestLogin: false,
-                            message: this.getInadequatePermissionsMessage(assetIndex)
+                            message: this.getInadequatePermissionsMessage(canvasIndex)
                         });
                     }
                 }
@@ -489,7 +489,7 @@ class Behaviours {
                     successCallback: successCallback,
                     failureCallback: failureCallback,
                     message: this.extension.provider.config.modules.loginDialogue.loginExpiredMessage,
-                    requestedIndex: assetIndex,
+                    requestedIndex: canvasIndex,
                     allowClose: this.allowCloseLogin()
                 });
                 break;
@@ -500,8 +500,8 @@ class Behaviours {
     }
 
     // ensures that a file is in the server cache.
-    prefetchAsset(assetIndex: number, successCallback: any): void{
-        var asset = this.extension.getAssetByIndex(assetIndex);
+    prefetchAsset(canvasIndex: number, successCallback: any): void{
+        var asset = this.extension.provider.getCanvasByIndex(canvasIndex);
 
         var prefetchUri = this.extension.provider.getPrefetchUri(asset);
 
@@ -515,26 +515,26 @@ class Behaviours {
         });
     }
 
-    viewIndex(assetIndex: number, successCallback?: any): void {
+    viewIndex(canvasIndex: number, successCallback?: any): void {
         // authorise.
-        this.authorise(assetIndex,
+        this.authorise(canvasIndex,
             // success callback
             (reload: boolean) => {
                 if (reload) {
                     // reload the package.
                     this.extension.provider.reload(() => {
                         $.publish(baseExtension.BaseExtension.RELOAD);
-                        this.viewIndex(assetIndex, successCallback);
+                        this.viewIndex(canvasIndex, successCallback);
                     });
                 } else {
 
-                    this.extension.currentAssetIndex = assetIndex;
-                    $.publish(baseExtension.BaseExtension.ASSET_INDEX_CHANGED, [assetIndex]);
+                    this.extension.provider.canvasIndex = canvasIndex;
+                    $.publish(baseExtension.BaseExtension.CANVAS_INDEX_CHANGED, [canvasIndex]);
 
-                    this.trackEvent('Pages', 'Viewed', 'Index: ' + String(assetIndex));
+                    this.trackEvent('Pages', 'Viewed', 'Index: ' + String(canvasIndex));
 
                     if (successCallback) {
-                        successCallback(assetIndex);
+                        successCallback(canvasIndex);
                     }
                 }
             },
@@ -542,7 +542,7 @@ class Behaviours {
             (message: string, retry: boolean) => {
                 this.extension.showDialogue(message, () => {
                     if (retry) {
-                        this.viewIndex(assetIndex, successCallback);
+                        this.viewIndex(canvasIndex, successCallback);
                     }
                 });
             }
