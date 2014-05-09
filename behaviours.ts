@@ -187,6 +187,17 @@ class Behaviours {
         });
 	}
 
+    isGuest(): boolean {
+        var dispName = $.cookie("wlauthdisp").b64_to_utf8();
+        var userTypeIndex = dispName.indexOf("|~|");
+
+        if (dispName.substr(userTypeIndex + 3, 1) == 'G') {
+            return true;
+        }
+
+        return false;
+    }
+
 	isSaveToLightboxEnabled(): boolean {
 
         if (this.extension.provider.config.options.saveToLightboxEnabled === false) return false;

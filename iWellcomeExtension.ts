@@ -2,32 +2,33 @@
 import IExtension = require("../coreplayer-shared-module/iExtension");
 
 interface IWellcomeExtension extends IExtension{
-	viewIndex(canvasIndex: number, successCallback?: any): void;
-	prefetchAsset(canvasIndex: number, successCallback: any): void;
+	$conditionsDialogue: JQuery;
+	$downloadDialogue: JQuery;
+	$embedDialogue: JQuery;
+	$helpDialogue: JQuery;
+	$loginDialogue: JQuery;
+	$restrictedFileDialogue: JQuery;
+
+	allowCloseLogin(): boolean;
 	authorise(canvasIndex: number, successCallback: any, failureCallback: any): void;
-	login(params: any): void;
-	viewNextAvailableIndex(requestedIndex: number, callback: any): void;
-	nextAvailableIndex(direction: number, requestedIndex: number): number;
-	showLoginDialogue(params): void;
-	isLoggedIn(): boolean;
+	closeActiveDialogue(): void;
+	getInadequatePermissionsMessage(canvasIndex): string;
 	hasPermissionToViewCurrentItem(): boolean;
 	isAuthorised(canvasIndex): boolean;
+	isDownloadEnabled(): boolean;
+	isGuest(): boolean;
+	isLoggedIn(): boolean;
+	isSaveToLightboxEnabled(): boolean;
+	login(params: any): void;
+	nextAvailableIndex(direction: number, requestedIndex: number): number;
+	prefetchAsset(canvasIndex: number, successCallback: any): void;
+	showLoginDialogue(params): void;
 	showRestrictedFileDialogue(params): void;
-	getInadequatePermissionsMessage(canvasIndex): string;
-	allowCloseLogin(): boolean;
-	updateSlidingExpiration(): void;
-	closeActiveDialogue(): void;
 	trackEvent(category: string, action: string, label: string, value: string): void;
 	trackVariable(slot: number, name: string, value: string, scope: number): void;
-	isSaveToLightboxEnabled(): boolean;
-	isDownloadEnabled(): boolean;
-
-	$loginDialogue: JQuery;
-	$embedDialogue: JQuery;
-	$downloadDialogue: JQuery;
-	$helpDialogue: JQuery;
-	$conditionsDialogue: JQuery;
-	$restrictedFileDialogue: JQuery;
+	updateSlidingExpiration(): void;
+	viewIndex(canvasIndex: number, successCallback?: any): void;
+	viewNextAvailableIndex(requestedIndex: number, callback: any): void;
 }
 
 export = IWellcomeExtension;
