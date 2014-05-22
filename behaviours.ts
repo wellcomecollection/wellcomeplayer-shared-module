@@ -20,9 +20,6 @@ class Behaviours {
 
 	sessionTimer: any;
 
-    static TRACK_EVENT: string = 'onTrackEvent';
-    static TRACK_VARIABLE: string = 'onTrackVariable';
-
 	constructor(public extension: IWellcomeExtension){
 
         // track events
@@ -278,7 +275,7 @@ class Behaviours {
                     ', Identifier: ' + identifier +
                     ', Digicode: ' + digicode +
                     ', Collection code: ' + collectioncode +
-                    ', Uri: ' + parent.document.URL;
+                    ', Uri: ' + this.extension.provider.getDomain();
         }
 
         return '';
@@ -314,11 +311,15 @@ class Behaviours {
                 that.sessionTimer = setTimeout(function () {
                     that.extension.closeActiveDialogue();
                     that.extension.showDialogue(that.extension.provider.config.modules.genericDialogue.content.sessionExpired, () => {
-                        that.extension.refresh();
+                        that.sessionExpired();
                     }, that.extension.provider.config.modules.genericDialogue.content.refresh, false);
                 }, ms);
             }
         });
+    }
+
+    sessionExpired(): void {
+        this.extension.triggerSocket("onSessionExpired", null);
     }
 
     allowCloseLogin(): boolean {
@@ -327,7 +328,7 @@ class Behaviours {
         // so don't allow it to be closed.
         // necessary for video/audio which have no ui to trigger
         // new login event.
-        return this.extension.provider.sequence.assets.length != 1;
+        return this.extension.provider.getTotalCanvases() != 1;
     }
 
     getInadequatePermissionsMessage(canvasIndex): string {
