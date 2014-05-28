@@ -479,9 +479,10 @@ class Behaviours {
                             successCallback: successCallback,
                             failureCallback: failureCallback,
                             requestedIndex: canvasIndex,
-                            allowClose: this.allowCloseLogin(),
+                            allowClose: false,
                             allowGuestLogin: true,
-                            message: this.getInadequatePermissionsMessage(canvasIndex)
+                            title: this.extension.provider.config.modules.loginDialogue.content.loginAsGuestTitle,
+                            message: this.extension.provider.config.modules.loginDialogue.content.loginAsGuestText,
                         });
                     } else {
                         // don't allow guest login.
@@ -500,7 +501,7 @@ class Behaviours {
                 this.showLoginDialogue({
                     successCallback: successCallback,
                     failureCallback: failureCallback,
-                    message: this.extension.provider.config.modules.loginDialogue.loginExpiredMessage,
+                    message: this.extension.provider.config.modules.loginDialogue.content.loginExpiredMessage,
                     requestedIndex: canvasIndex,
                     allowClose: this.allowCloseLogin()
                 });
