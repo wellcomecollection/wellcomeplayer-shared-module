@@ -498,13 +498,25 @@ class Behaviours {
                 }
                 break;
             case 'expired':
-                this.showLoginDialogue({
-                    successCallback: successCallback,
-                    failureCallback: failureCallback,
-                    message: this.extension.provider.config.modules.loginDialogue.content.loginExpiredMessage,
-                    requestedIndex: canvasIndex,
-                    allowClose: this.allowCloseLogin()
-                });
+                if (this.isGuest()){
+                    this.showLoginDialogue({
+                        successCallback: successCallback,
+                        failureCallback: failureCallback,
+                        requestedIndex: canvasIndex,
+                        allowClose: false,
+                        allowGuestLogin: true,
+                        title: this.extension.provider.config.modules.loginDialogue.content.loginAsGuestTitle,
+                        message: this.extension.provider.config.modules.loginDialogue.content.loginAsGuestText,
+                    });
+                } else {
+                    this.showLoginDialogue({
+                        successCallback: successCallback,
+                        failureCallback: failureCallback,
+                        message: this.extension.provider.config.modules.loginDialogue.content.loginExpiredMessage,
+                        requestedIndex: canvasIndex,
+                        allowClose: this.allowCloseLogin()
+                    });
+                }
                 break;
             case 'notacceptedtermsyet':
                 this.extension.showDialogue(this.extension.provider.config.modules.genericDialogue.content.notAcceptedTermsYetMessage);
