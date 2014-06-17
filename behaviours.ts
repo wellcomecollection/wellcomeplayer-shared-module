@@ -484,6 +484,11 @@ class Behaviours {
                             title: this.extension.provider.config.modules.loginDialogue.content.loginAsGuestTitle,
                             message: this.extension.provider.config.modules.loginDialogue.content.loginAsGuestText,
                         });
+                    } else if (section.extensions.accessCondition.toLowerCase() === "restricted files"){
+                        this.showRestrictedFileDialogue({
+                            requestedIndex: canvasIndex,
+                            allowClose: this.allowCloseLogin()
+                        });
                     } else {
                         // don't allow guest login.
                         this.showLoginDialogue({
