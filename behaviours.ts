@@ -269,16 +269,14 @@ class Behaviours {
             if (moreInfo.Institution) institution = moreInfo.Institution;
             if (moreInfo.marc759a) digicode = moreInfo.marc759a;
             if (moreInfo.marc905a) collectioncode = moreInfo.marc905a;
-
-            return  'Format: ' + format +
-                    ', Institution: ' + institution +
-                    ', Identifier: ' + identifier +
-                    ', Digicode: ' + digicode +
-                    ', Collection code: ' + collectioncode +
-                    ', Uri: ' + this.extension.provider.getDomain();
         }
 
-        return '';
+        return  'Format: ' + format +
+                ', Institution: ' + institution +
+                ', Identifier: ' + identifier +
+                ', Digicode: ' + digicode +
+                ', Collection code: ' + collectioncode +
+                ', Uri: ' + this.extension.provider.getEmbedDomain();
     }
 
     updateSlidingExpiration(): void {
