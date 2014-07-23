@@ -68,6 +68,18 @@ class Behaviours {
             this.trackEvent('Player Interactions', 'Log in', 'Opened');
         });
 
+        $.subscribe(login.LoginDialogue.VIEW_TERMS, () => {
+            this.trackEvent('Player Interactions', 'Ts & Cs', 'Loaded');
+        });
+
+        $.subscribe(login.LoginDialogue.VIEW_FULL_TERMS, () => {
+            this.trackEvent('Player Interactions', 'Ts & Cs', 'Viewed');
+        });
+
+        $.subscribe(login.LoginDialogue.ACCEPT_TERMS, () => {
+            this.trackEvent('Player Interactions', 'Ts & Cs', 'Accepted');
+        });
+
         $.subscribe(help.HelpDialogue.SHOW_HELP_DIALOGUE, () => {
             this.trackEvent('Player Interactions', 'Help', 'Opened', '');
         });
