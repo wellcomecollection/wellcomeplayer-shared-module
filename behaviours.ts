@@ -422,7 +422,7 @@ class Behaviours {
     }
 
     login(params: any) {
-        var ajaxOptions = {
+        var ajaxOptions: JQueryAjaxSettings = {
             url: this.extension.provider.getLoginUri(params.username, params.password),
             type: "GET",
             dataType: "json",
