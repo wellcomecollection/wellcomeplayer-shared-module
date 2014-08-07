@@ -1,4 +1,4 @@
-
+import utils = require("../../utils");
 import IExtension = require("../coreplayer-shared-module/iExtension");
 import IWellcomeExtension = require("./iWellcomeExtension");
 import IProvider = require("../coreplayer-shared-module/iProvider");
@@ -219,6 +219,10 @@ class Behaviours {
     isDownloadEnabled(): boolean {
 
         // download enabled?
+        if (!utils.Utils.getBool(this.extension.provider.config.modules.footerPanel.options.downloadEnabled, true)){
+            return false;
+        }
+
         switch (this.extension.provider.type) {
             case "book":
                 if (this.extension.provider.config.options.bookDownloadEnabled === false) {
