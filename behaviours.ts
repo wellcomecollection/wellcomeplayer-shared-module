@@ -219,23 +219,23 @@ class Behaviours {
     isDownloadEnabled(): boolean {
 
         // download enabled?
-        if (!utils.Utils.getBool(this.extension.provider.config.modules.footerPanel.options.downloadEnabled, true)){
+        if (!utils.Utils.getBool(this.extension.provider.config.options.downloadEnabled, true)){
             return false;
         }
 
-        switch (this.extension.provider.type) {
-            case "book":
-                if (this.extension.provider.config.options.bookDownloadEnabled === false) {
+        switch (this.extension.provider.getManifestType()) {
+            case "monograph":
+                if (!utils.Utils.getBool(this.extension.provider.config.options.bookDownloadEnabled, true)) {
                     return false;
                 }
                 break;
             case "video":
-                if (this.extension.provider.config.options.videoDownloadEnabled === false) {
+                if (!utils.Utils.getBool(this.extension.provider.config.options.videoDownloadEnabled, true)) {
                     return false;
                 }
                 break;
             case "audio":
-                if (this.extension.provider.config.options.audioDownloadEnabled === false) {
+                if (!utils.Utils.getBool(this.extension.provider.config.options.audioDownloadEnabled, true)) {
                     return false;
                 }
                 break;
