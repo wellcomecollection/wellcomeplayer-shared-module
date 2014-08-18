@@ -207,9 +207,15 @@ class Behaviours {
         return false;
     }
 
+    isEmbedEnabled(): boolean {
+        return (utils.Utils.getBool(this.extension.provider.config.options.embedEnabled, true) &&
+                this.extension.provider.manifest.extensions &&
+                this.extension.provider.manifest.extensions.isAllOpen);
+    }
+
 	isSaveToLightboxEnabled(): boolean {
 
-        if (this.extension.provider.config.options.saveToLightboxEnabled === false) return false;
+        if (!utils.Utils.getBool(this.extension.provider.config.options.saveToLightboxEnabled, true)) return false;
         if (!this.extension.provider.isHomeDomain) return false;
         if (!this.extension.provider.isOnlyInstance) return false;
 
@@ -219,9 +225,7 @@ class Behaviours {
     isDownloadEnabled(): boolean {
 
         // download enabled?
-        if (!utils.Utils.getBool(this.extension.provider.config.options.downloadEnabled, true)){
-            return false;
-        }
+        if (!utils.Utils.getBool(this.extension.provider.config.options.downloadEnabled, true)) return false;
 
         switch (this.extension.provider.getManifestType()) {
             case "monograph":

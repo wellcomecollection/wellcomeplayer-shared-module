@@ -18,6 +18,7 @@ interface IWellcomeExtension extends IExtension{
 	isDownloadEnabled(): boolean;
 	isGuest(): boolean;
 	isLoggedIn(): boolean;
+    isEmbedEnabled(): boolean;
 	isSaveToLightboxEnabled(): boolean;
 	login(params: any): void;
 	nextAvailableIndex(direction: number, requestedIndex: number): number;
