@@ -197,7 +197,7 @@ class Behaviours {
 	}
 
     isGuest(): boolean {
-        var dispName = $.cookie("wlauthdisp").b64_to_utf8();
+        var dispName = $.cookie("wlauthssodisp").b64_to_utf8();
         var userTypeIndex = dispName.indexOf("|~|");
 
         if (dispName.substr(userTypeIndex + 3, 1) == 'G') {
@@ -387,7 +387,7 @@ class Behaviours {
     }
 
     isLoggedIn(): boolean {
-        return document.cookie.indexOf("wlauth") >= 0;
+        return document.cookie.indexOf("wlauthsso") >= 0;
     }
 
     showLoginDialogue(params): void {
